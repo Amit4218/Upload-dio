@@ -1,15 +1,25 @@
 from fastapi import FastAPI
-from config.db import Base, engine
+from config.db import Base, engine, get_db
 from src.routes.dashboard import dashboard_router
 from src.routes.image_upload import image_upload_router
-
+from models.admin import Admin, create_admin
+from models.bucket_config import BucketConfig, Images
 
 app = FastAPI(title="Image Uploader API")
-Base.metadata.create_all(bind=engine)  # create the db and the tables
-
+Base.metadata.create_all(bind=engine)
 
 app.include_router(dashboard_router)
 app.include_router(image_upload_router)
+
+
+@app.on_event("startup")
+def startup_event():
+    try:
+        db = next(get_db())
+        msg = create_admin(db)
+        print(msg)
+    except Exception as e:
+        raise RuntimeError("Startup failed", e)
 
 
 @app.get("/root/health")
