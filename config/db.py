@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
+from settings.env_provider import DATABASE_URL
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./images.db"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={
+engine = create_engine(DATABASE_URL, connect_args={
                        "check_same_thread": False})
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -14,7 +13,7 @@ class Base(DeclarativeBase):
 
 
 def get_db():
-    db = SessionLocal()
+    db: Session = SessionLocal()
     try:
         yield db
     finally:
