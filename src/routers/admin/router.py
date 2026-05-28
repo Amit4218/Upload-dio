@@ -1,20 +1,22 @@
-from fastapi.routing import APIRouter
-from models.admin import Admin
-from fastapi import Depends, Form, Request, HTTPException
-from config.db import get_db, Session
-from sqlalchemy import select
 from typing import Annotated
-from schemas.auth import AdminLogin, LoginResponse
 
-auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
+from fastapi.routing import APIRouter
+from fastapi import Depends, Form, Request, HTTPException, status
+from sqlalchemy import select
+
+from config.db import get_db, Session
+from models.admin import Admin
+from src.routers.admin.schemas.auth import AdminLogin, LoginResponse
+
+admin_router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-@auth_router.post("/login", response_model=LoginResponse)
-def login_admin(
+@admin_router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
+async def login_admin(
     req: Request,
     data: Annotated[AdminLogin, Form()],
     db: Session = Depends(get_db)
-):
+) -> LoginResponse:
 
     admin = db.execute(
         select(Admin).where(
@@ -24,7 +26,7 @@ def login_admin(
 
     if not admin:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
 
@@ -35,11 +37,8 @@ def login_admin(
 
     if not is_pass_correct:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
-
-    # Set Session
-    req.session["id"] = admin.id
-
-    return LoginResponse(status_code=200, success=True)
+        
+    # set session for the admin

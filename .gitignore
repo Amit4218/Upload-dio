@@ -11,5 +11,6 @@ wheels/
 .env
 # local-file-folder
 test.py
+local
 static/*
 *.db

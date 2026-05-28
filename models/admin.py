@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from config.db import Base, Session
-from settings.env_provider import ADMIN_USERNAME, ADMIN_PASSWORD
+from src.utils.settings import settings
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(
@@ -40,15 +40,15 @@ def create_admin(db: Session) -> str:
     if already_exist:
         return "Admin already exists"
 
-    if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+    if not settings.ADMIN_USERNAME or not settings.ADMIN_PASSWORD:
         raise Exception(
             "No admin username or password found in .env"
         )
 
-    hashed_password = Admin.hash_password(ADMIN_PASSWORD)
+    hashed_password = Admin.hash_password(settings.ADMIN_PASSWORD)
 
     admin = Admin(
-        username=ADMIN_USERNAME,
+        username=settings.ADMIN_USERNAME,
         password=hashed_password
     )
 

@@ -6,7 +6,7 @@ from datetime import datetime
 import secrets
 
 
-BucketType = Literal["AWS", "CLOUDFLARE"]
+BucketType = Literal["AWS", "CLOUDFLARE", "CLOUDINARY","IMAGEKIT"]
 
 
 class BucketConfig(Base):
