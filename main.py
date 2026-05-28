@@ -8,8 +8,8 @@ from config.db import Base, engine, get_db
 from src.utils.settings import settings
 from src.routers.dashboard.router import dashboard_router
 from src.routers.image_upload.router import image_upload_router
-from src.routers.admin.router import admin_router
-from models.admin import create_admin, Admin  # noqa: F401 
+from src.routers.admin.router import admin_router, create_admin
+from models.admin import Admin  # noqa: F401 
 from models.bucket_config import BucketConfig, Images # noqa: F401
 
 
