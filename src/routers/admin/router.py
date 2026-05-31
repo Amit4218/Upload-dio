@@ -1,16 +1,13 @@
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
-from uuid import uuid4
 
 from fastapi.routing import APIRouter
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
 import jwt
 
-from config.db import get_db
+from config.db import get_collection
 from models.admin import Admin
 from src.utils.settings import settings
 
@@ -20,10 +17,13 @@ password_hash = PasswordHash.recommended()
 admin_router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-def create_admin(db: Session) -> None:
-    already_exist = Admin.exists(db=db)
+async def create_admin() -> None:
+    
+    admin_collection = get_collection("admin")
+    
+    already_exist = await admin_collection.count_documents({})
 
-    if already_exist:
+    if already_exist > 0:
         return
 
     if not settings.ADMIN_USERNAME or not settings.ADMIN_PASSWORD:
@@ -31,23 +31,22 @@ def create_admin(db: Session) -> None:
 
     hashed_password = password_hash.hash(settings.ADMIN_PASSWORD)
 
-    admin = Admin(
-        username=settings.ADMIN_USERNAME,
-        password=hashed_password
+    await admin_collection.insert_one(
+        Admin(
+            username=settings.ADMIN_USERNAME,
+            password=hashed_password
+        ).model_dump()
     )
 
-    db.add(admin)
-    db.commit()
 
 @admin_router.post("/login")
 async def login_admin(
     data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db)
 ):
+    
+    admin_collection = get_collection("admin")
 
-    admin = db.execute(
-        select(Admin).where(Admin.username == data.username)
-    ).scalar_one_or_none()
+    admin = await admin_collection.find_one({"username":data.username})
 
     if not admin:
         raise HTTPException(
@@ -57,7 +56,7 @@ async def login_admin(
 
     is_pass_correct = password_hash.verify(
         data.password,
-        admin.password
+        admin["password"]
     )
 
     if not is_pass_correct:
@@ -72,7 +71,7 @@ async def login_admin(
     
     access_token = jwt.encode(
         {
-            "sub": admin.username,
+            "sub": str(admin["_id"]),
             "exp": expire
         },
         settings.SECRET_KEY,

@@ -1,41 +1,35 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from config.db import Base
-from typing import Self, Literal
-from datetime import datetime
-import secrets
+from pydantic import BaseModel
+from typing import Literal, List, Optional
 
 
-BucketType = Literal["AWS", "CLOUDFLARE", "CLOUDINARY","IMAGEKIT"]
+BucketProviderType = Literal["AWS", "CLOUDFLARE", "CLOUDINARY","IMAGEKIT"]
+EXT_TYPE = Literal["png", "jpeg", "webp"]
 
 
-class BucketConfig(Base):
-    __tablename__ = "bucket_config"
+class Resize(BaseModel):
+    height: int
+    width: int
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    type = Column(String, nullable=False, default="CLOUDFLARE")
-    bucket_name = Column(String, nullable=False)
-    access_id = Column(String, nullable=False)
-    access_secret = Column(String, nullable=False)
-    allowed_origin = Column(String, nullable=False)
-    bucket_url = Column(String, nullable=False)
-    public_access_id = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+class ChangeFileExtention(BaseModel):
+    change_file_ext: bool = False
+    ext: EXT_TYPE = "webp"
 
-    images = relationship("Images", back_populates="bucket",
-                          cascade="all, delete-orphan")
+class BucketImageSettings(BaseModel):
+    resize: Resize
+    compress_image:bool
+    change_file_ext: ChangeFileExtention
 
-    def generate_public_access_id(self) -> Self:
-        self.public_access_id = secrets.token_urlsafe(12)
-        return self
+class Images(BaseModel):
+    filename:str
+    url:str
 
-
-class Images(Base):
-    __tablename__ = "images"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    filename = Column(String, nullable=False)
-    url = Column(String, nullable=False)
-    bucket_id = Column(Integer, ForeignKey("bucket_config.id"), nullable=False)
-    bucket = relationship("BucketConfig", back_populates="images")
-    created_at = Column(DateTime, default=datetime.utcnow)
+class BucketConfig(BaseModel):
+    bucket_provider: BucketProviderType
+    bucket_name: str
+    access_id: str
+    access_secret: str
+    allowed_origin: str
+    bucket_url: str
+    public_access_id:str
+    image_settings: BucketImageSettings
+    images:Optional[List[Images]] = None

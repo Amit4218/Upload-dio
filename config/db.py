@@ -1,19 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
 from src.utils.settings import settings
+from pymongo import AsyncMongoClient
 
-engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
+client = AsyncMongoClient(settings.DATABASE_URL)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-def get_db():
-    db: Session = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def get_collection(collection_name: str):
+    """returns the datatbase collection as per the collection_name"""
+    db = client["image_uploader"] # database name
+    collection = db[collection_name]
+    return collection

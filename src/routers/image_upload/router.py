@@ -1,11 +1,13 @@
-from fastapi import HTTPException, UploadFile, File, Depends
+import os
+import shutil
+
+from fastapi import HTTPException, UploadFile, File
 from fastapi.routing import APIRouter
-from config.db import get_db, Session
+
+from config.db import get_collection
 from models.bucket_config import BucketConfig
 from src.routers.image_upload.schemas.image import ImageUploadSuccess
 from src.utils.process_image import ProcessImage
-import os
-import shutil
 
 image_upload_router = APIRouter(prefix="/api/upload", tags=["image_upload"])
 
@@ -14,16 +16,15 @@ image_upload_router = APIRouter(prefix="/api/upload", tags=["image_upload"])
 async def upload_image_to_bucket(
         bucket_id: str,
         files: list[UploadFile] = File(...),
-        db: Session = Depends(get_db)
-
 ) -> ImageUploadSuccess:
 
     if not files:
         raise HTTPException(status_code=404, detail="file not found")
     
+    bucket_collection = get_collection("bucket_config") 
+    
     # get data for the bucket config
-    result = db.query(BucketConfig).filter_by(
-        public_access_id=bucket_id).first()
+    result = bucket_collection.find_one({"public_access_id":bucket_id})
 
     if not result:
         raise HTTPException(

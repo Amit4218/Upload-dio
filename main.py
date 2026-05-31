@@ -4,29 +4,24 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from contextlib import asynccontextmanager
 
-from config.db import Base, engine, get_db
 from src.utils.settings import settings
 from src.routers.dashboard.router import dashboard_router
 from src.routers.image_upload.router import image_upload_router
 from src.routers.admin.router import admin_router, create_admin
-from models.admin import Admin  # noqa: F401 
-from models.bucket_config import BucketConfig, Images # noqa: F401
+# from models.admin import Admin  # noqa: F401 
+# from models.bucket_config import BucketConfig, Images # noqa: F401
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db = next(get_db())
     try:
-        create_admin(db)
+        await create_admin()
         yield
     except Exception as e:
         raise RuntimeError("Startup failed") from e
-    finally:
-        db.close()
 
 
 app = FastAPI(title="Image Uploader API", lifespan=lifespan)
-Base.metadata.create_all(bind=engine)
 
 template = Jinja2Templates(directory="templates")
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
