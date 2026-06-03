@@ -41,4 +41,4 @@ async def root():
 
 @app.get("/")
 async def home(req: Request):
-    return template.TemplateResponse(request=req, name="index.html")
+    return template.TemplateResponse(request=req, name="pages/login.html")
