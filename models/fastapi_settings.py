@@ -30,7 +30,7 @@ async def create_default_settings() -> None:
     existing_settings = await settings_collection.count_documents({})
     
     if existing_settings == 0:
-        await settings_collection.insert_one(
-            ApplicationSettings().model_dump(),
-            ExtraSettings().model_dump()
-        )
+        await settings_collection.insert_one({
+            **ApplicationSettings().model_dump(),
+            **ExtraSettings().model_dump()
+        })

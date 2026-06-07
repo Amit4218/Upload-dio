@@ -1,50 +1,19 @@
 from pydantic import BaseModel
 from typing import Literal, List, Optional, Union
 
+from models.bucket_config_models.cloudinary_models import CloudinaryConfig
+from models.bucket_config_models.imagekit_model import ImageKitConfig
+from models.bucket_config_models.cloudflare_model import CloudflareConfig
+from models.bucket_config_models.aws_model import AWSConfig
+from models.bucket_config_models.extras import BucketImageSettings
+
 
 BucketProviderType = Literal["AWS", "CLOUDFLARE", "CLOUDINARY","IMAGEKIT"]
-EXT_TYPE = Literal["png", "jpeg", "webp"]
 
-
-class Resize(BaseModel):
-    resize_image: bool = False
-    height: int
-    width: int
-
-class ChangeFileExtention(BaseModel):
-    change_file_ext: bool = False
-    ext: EXT_TYPE = "webp"
-
-class BucketImageSettings(BaseModel):
-    resize: Resize
-    compress_image:bool
-    change_file_ext: ChangeFileExtention
 
 class Images(BaseModel):
     filename:str
     url:str
-
-
-class CloudinaryConfig(BaseModel):
-    cloud_name: str
-    api_key: str
-    api_secret: str
-    
-
-class ImageKitConfig(BaseModel):
-    public_key: str
-    private_key: str
-    url_endpoint: str
-    
-class AWSConfig(BaseModel):
-    access_id: str
-    access_secret: str
-    bucket_url: str
-
-class CloudflareConfig(BaseModel):
-    access_id: str
-    access_secret: str
-    bucket_url: str
 
 class BucketConfig(BaseModel):
     bucket_provider: BucketProviderType
