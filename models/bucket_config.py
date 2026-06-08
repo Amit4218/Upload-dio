@@ -22,4 +22,4 @@ class BucketConfig(BaseModel):
     allowed_origin: str
     public_access_id:str
     image_settings: BucketImageSettings
-    images:Optional[List[Images]] = None
+    images:Optional[List[Images]] = []
