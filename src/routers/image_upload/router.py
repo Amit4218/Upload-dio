@@ -8,7 +8,7 @@ from config.db import get_collection
 from models.bucket_config import BucketConfig, Images
 from src.routers.image_upload.schemas.image import ImageUploadSuccess
 from src.utils.process_image import process_image
-from services import CloudinaryService
+from services import upload_image_to_cloudinary
 
 image_upload_router = APIRouter(prefix="/api/upload", tags=["image_upload"])
 
@@ -58,21 +58,19 @@ async def upload_image_to_bucket(
                     result=bucket.image_settings,
                     path=save_path
                 )
+                
+            # determine the image file path
+            file_path = processed_image_path if bucket.image_settings else save_path
 
             # upload the image to the cloud bucket
             match bucket.bucket_provider:
 
                 case 'CLOUDINARY':
-     
-                    cloudinary_service = CloudinaryService(
+                    
+                    url = upload_image_to_cloudinary(
                         cloud_name=bucket.provider_config.cloud_name,
                         api_key=bucket.provider_config.api_key,
                         api_secret=bucket.provider_config.api_secret,
-                    )
-                    
-                    file_path = processed_image_path if bucket.image_settings else save_path
-
-                    url = cloudinary_service.upload_image(
                         file_path=file_path,
                         public_id=file.filename
                     )

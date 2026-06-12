@@ -26,3 +26,21 @@ class CloudinaryService:
             
         except Exception as e:
             raise Exception(f"Error uploading image: {e}")
+
+
+
+def upload_image_to_cloudinary(
+    cloud_name:str,
+    api_key:str,
+    api_secret:str,
+    file_path: Path,
+    public_id: str = None
+) -> str:
+    
+    cloudinary_service = CloudinaryService(
+        cloud_name=cloud_name,
+        api_key=api_key,
+        api_secret=api_secret
+    )
+    
+    return cloudinary_service.upload_image(file_path=file_path, public_id=public_id)
