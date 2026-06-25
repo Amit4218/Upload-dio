@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+uploadio-rewrite
+
+# Virtual environments
+.venv
+.env
+
+# local-file-folder
+test.py
+local
+static/*
+*.db
