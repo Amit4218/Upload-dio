@@ -22,7 +22,7 @@ async def create_bucket_config(data:BucketConfigSchema, _ = Depends(is_admin)):
     # generate an public access id for the client
     payload["public_access_id"] = secrets.token_urlsafe(12)
 
-    new_bucket = BucketConfig(**payload)
+    new_bucket = BucketConfig(**payload, providers=None)
 
     await bucket_collection.insert_one(
         new_bucket.model_dump()
