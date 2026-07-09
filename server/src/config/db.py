@@ -5,6 +5,6 @@ client = AsyncMongoClient(settings.DATABASE_URL)
 
 def get_collection(collection_name: str):
     """returns the datatbase collection as per the collection_name"""
-    db = client["image_uploader"] # database name
+    db = client[settings.DATABASE_NAME]
     collection = db[collection_name]
     return collection
