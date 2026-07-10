@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+
+from fastapi.responses import JSONResponse
 
 from src.utils.admin import create_default_admin
 from src.routers.admin import admin_router
@@ -28,6 +31,37 @@ app.add_middleware(
 app.include_router(admin_router)
 app.include_router(file_upload_router)
 app.include_router(dashboard_router)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "statusCode": exc.status_code,
+            "detail": exc.detail,
+        },
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "statusCode": 422,
+            "detail": "Validation failed",
+        },
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "statusCode": 500,
+            "detail": "Internal Server Error",
+        },
+    )
 
 
 @app.get("/root/health")
