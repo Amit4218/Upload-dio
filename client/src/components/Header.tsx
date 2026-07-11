@@ -8,16 +8,12 @@ export default function Header() {
   const { resolvedTheme, toggleTheme } = useTheme();
 
   return (
-    <div className="flex justify-between px-4 md:px-10 py-2">
-      <NavLink to="/">
-        <img src="/logo.png" alt="uplodio logo" className="h-7 w-auto" />
-      </NavLink>
-
+    <div className="absolute  right-4 z-10 rounded-md px-4">
       <div className="flex items-center gap-1">
         <Button
-          className={"border-0 bg-0 -px-0.5"}
-          size={"icon-lg"}
-          variant={"link"}
+          className="border-0 bg-transparent px-0.5"
+          size="icon-lg"
+          variant="link"
           onClick={toggleTheme}
         >
           {resolvedTheme === "dark" ? <Sun /> : <Moon />}
