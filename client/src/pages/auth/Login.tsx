@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +6,7 @@ import { login } from "@/api/auth";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -39,7 +38,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-3 py-4">
+    <div className="flex mt-16 items-center justify-center p-2">
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-4 text-center">
           <img
