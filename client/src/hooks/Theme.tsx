@@ -40,19 +40,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const updateTheme = () => {
+    const applyTheme = () => {
       const resolved = theme === "system" ? getSystemTheme() : theme;
 
       setResolvedTheme(resolved);
 
-      document.documentElement.setAttribute("data-theme", resolved);
+      document.documentElement.classList.toggle("dark", resolved === "dark");
     };
 
-    updateTheme();
+    applyTheme();
 
-    media.addEventListener("change", updateTheme);
+    media.addEventListener("change", applyTheme);
 
-    return () => media.removeEventListener("change", updateTheme);
+    return () => media.removeEventListener("change", applyTheme);
   }, [theme]);
 
   useEffect(() => {
@@ -65,15 +65,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       resolvedTheme,
       setTheme,
       toggleTheme: () =>
-        setTheme((prev) =>
-          prev === "dark"
-            ? "light"
-            : prev === "light"
-              ? "dark"
-              : getSystemTheme() === "dark"
-                ? "light"
-                : "dark",
-        ),
+        setTheme((prev) => {
+          const current = prev === "system" ? getSystemTheme() : prev;
+
+          return current === "dark" ? "light" : "dark";
+        }),
     }),
     [theme, resolvedTheme],
   );
