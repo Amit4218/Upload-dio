@@ -23,6 +23,7 @@ import {
   PackageOpen,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const NAVIGATION_LINKS = [
   { link: "/dashboard", tooktip: "Dashboard", icon: LayoutDashboard },
@@ -80,12 +81,10 @@ function AppSidebar() {
               <DropdownMenuTrigger
                 render={
                   <SidebarMenuButton size="sm" tooltip="profile">
-                    <img
-                      src="/default_profile.png"
-                      alt="Profile"
-                      className="h-6 w-6 rounded-full"
-                    />
-
+                    <Avatar size="sm">
+                      <AvatarImage src="/default_profile.png" alt="Profile" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
                     <div className="flex min-w-0 flex-1 flex-col text-left">
                       <span className="truncate text-sm font-medium">
                         John Doe
@@ -102,7 +101,7 @@ function AppSidebar() {
 
               <DropdownMenuContent side="top" align="end" className="w-30">
                 <DropdownMenuItem>
-                  <NavLink className={"flex"} to={"/dashboard/profile"}>
+                  <NavLink className={"flex w-full"} to={"/dashboard/profile"}>
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </NavLink>
