@@ -25,6 +25,11 @@ interface UploadConfig {
   };
 }
 
+interface UploadConfigModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
 const defaultConfig: UploadConfig = {
   bucket_name: "",
   allowed_origin: "",
@@ -49,12 +54,23 @@ const defaultConfig: UploadConfig = {
   },
 };
 
-export default function UploadConfigModal() {
+export default function UploadConfigModal({
+  open,
+  onClose,
+}: UploadConfigModalProps) {
   const [config, setConfig] = useState<UploadConfig>(defaultConfig);
 
+  if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-xl bg-background text-foreground shadow-2xl border border-border">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-xl bg-background text-foreground shadow-2xl border border-border"
+      >
         {/* Header */}
         <div className="p-6 border-b border-border">
           <h2 className="text-xl font-semibold tracking-tight">
@@ -301,14 +317,20 @@ export default function UploadConfigModal() {
 
         {/* Footer */}
         <div className="p-4 border-t border-border flex items-center justify-end gap-3 bg-background">
-          <button className="px-4 py-2 text-sm font-medium rounded-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
             Cancel
           </button>
           <button
             className="px-5 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition-colors"
-            onClick={() => console.log(config)}
+            onClick={() => {
+              console.log(config);
+              onClose();
+            }}
           >
-            Save Changes
+            Create bucket
           </button>
         </div>
       </div>
